@@ -1,0 +1,134 @@
+# ================================
+# 1. IMPORT LIBRARIES
+# ================================
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+from sklearn.linear_model import LinearRegression
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import r2_score, mean_squared_error
+
+np.random.seed(42)
+
+# ================================
+# 2. GENERATE SYNTHETIC DATA
+# ================================
+
+n = 10000  # large dataset for robustness
+
+data = pd.DataFrame({
+    "age": np.random.randint(5, 85, n),
+    "gender": np.random.choice(["Male", "Female"], n),
+    "smoker": np.random.choice([0, 1], n, p=[0.7, 0.3]),
+
+    # Pollution indicators (µg/m³)
+    "pm25": np.random.normal(35, 15, n).clip(5, 150),
+    "pm10": np.random.normal(60, 20, n).clip(10, 200),
+    "no2": np.random.normal(40, 10, n).clip(5, 100),
+    "so2": np.random.normal(20, 8, n).clip(2, 80),
+    "o3": np.random.normal(30, 12, n).clip(5, 100),
+
+    # Socioeconomic factor
+    "income_level": np.random.choice(["Low", "Middle", "High"], n, p=[0.4, 0.4, 0.2])
+})
+
+# ================================
+# 3. CREATE TARGET VARIABLE
+# Respiratory Disease Risk Score
+# ================================
+
+# Encode categorical variables
+data["gender"] = data["gender"].map({"Male": 1, "Female": 0})
+data["income_level"] = data["income_level"].map({"Low": 0, "Middle": 1, "High": 2})
+
+# Create a realistic risk score
+data["respiratory_risk"] = (
+    0.03 * data["age"] +
+    0.8 * data["smoker"] +
+    0.05 * data["pm25"] +
+    0.03 * data["pm10"] +
+    0.04 * data["no2"] +
+    0.02 * data["so2"] +
+    0.01 * data["o3"] -
+    0.5 * data["income_level"] +
+    np.random.normal(0, 2, n)  # noise
+)
+
+# Convert risk into binary disease outcome
+data["respiratory_disease"] = (data["respiratory_risk"] > data["respiratory_risk"].median()).astype(int)
+
+# ================================
+# 4. EXPLORATORY DATA ANALYSIS
+# ================================
+
+print("\nDataset Preview:")
+print(data.head())
+
+print("\nSummary Statistics:")
+print(data.describe())
+
+# Correlation matrix
+plt.figure(figsize=(10, 6))
+sns.heatmap(data.corr(), annot=True, cmap="coolwarm")
+plt.title("Correlation Matrix")
+plt.show()
+
+# Pollution vs Disease
+plt.figure(figsize=(8, 5))
+sns.boxplot(x="respiratory_disease", y="pm25", data=data)
+plt.title("PM2.5 vs Respiratory Disease")
+plt.show()
+
+# ================================
+# 5. REGRESSION MODEL
+# ================================
+
+features = ["age", "smoker", "pm25", "pm10", "no2", "so2", "o3", "income_level"]
+target = "respiratory_risk"
+
+X = data[features]
+y = data[target]
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
+
+model = LinearRegression()
+model.fit(X_train, y_train)
+
+y_pred = model.predict(X_test)
+
+# ================================
+# 6. MODEL EVALUATION
+# ================================
+
+print("\nModel Performance:")
+print("R² Score:", r2_score(y_test, y_pred))
+print("RMSE:", np.sqrt(mean_squared_error(y_test, y_pred)))
+
+# Coefficients
+coefficients = pd.DataFrame({
+    "Feature": features,
+    "Coefficient": model.coef_
+})
+
+print("\nFeature Importance:")
+print(coefficients.sort_values(by="Coefficient", ascending=False))
+
+# ================================
+# 7. VISUALIZE PREDICTIONS
+# ================================
+
+plt.figure(figsize=(6, 6))
+plt.scatter(y_test, y_pred, alpha=0.5)
+plt.xlabel("Actual Risk")
+plt.ylabel("Predicted Risk")
+plt.title("Actual vs Predicted Respiratory Risk")
+plt.show()
+
+# ================================
+# 8. SAVE DATASET
+# ================================
+
+data.to_csv("synthetic_air_pollution_health_data.csv", index=False)
+print("\nDataset saved successfully.")
