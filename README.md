@@ -68,7 +68,7 @@ Age contributes steadily to increased respiratory risk
 
 🚀 How to Run the Project
 Clone the repository:
-git clone https://github.com/your-username/air-pollution-analysis.git
+git clone https://github.com/joanjosh17/air-pollution-analysis.git
 cd air-pollution-analysis
 Install dependencies:
 pip install -r requirements.txt
