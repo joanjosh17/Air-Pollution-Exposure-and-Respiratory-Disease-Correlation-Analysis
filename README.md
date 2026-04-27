@@ -57,11 +57,15 @@ Train-test split for evaluation
 5. Evaluation Metrics
 R² Score
 Root Mean Squared Error (RMSE)
+
+
 📈 Key Insights
 Higher exposure to PM2.5 and NO₂ shows strong correlation with increased respiratory risk
 Smoking status significantly amplifies health risk
 Lower income levels are associated with higher vulnerability
 Age contributes steadily to increased respiratory risk
+
+
 🚀 How to Run the Project
 Clone the repository:
 git clone https://github.com/your-username/air-pollution-analysis.git
@@ -70,10 +74,14 @@ Install dependencies:
 pip install -r requirements.txt
 Run the script:
 python air_pollution_analysis.py
+
+
 Output:
 Visualizations
 Model performance metrics
 Generated dataset (.csv / .xlsx)
+
+
 📂 Project Structure
 ├── data/
 │   └── synthetic_air_pollution_health_data.xlsx
@@ -85,12 +93,15 @@ Generated dataset (.csv / .xlsx)
 │   └── figures/
 ├── README.md
 └── requirements.txt
+
+
 💡 Future Improvements
 Add time-series analysis of pollution exposure
 Incorporate geospatial mapping (city-level clustering)
 Use advanced models (Random Forest, XGBoost)
 Build an interactive dashboard (Streamlit / Power BI)
 Integrate real-world datasets for validation
+
 👤 Author
 
 Joan Jushua
